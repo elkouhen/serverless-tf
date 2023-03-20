@@ -26,6 +26,11 @@ module "api" {
   helloworld_arn = module.helloworld.function_arn
 }
 
+module "cognito" {
+  source         = "../modules/cognito/"
+  env            = "dev"
+}
+
 output "api_arn" {
   value = module.api.api_arn
 }
