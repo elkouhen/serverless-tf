@@ -1,0 +1,55 @@
+openapi: "3.0.1"
+info:
+  version: "1"
+  title: "Helloworld documentation"
+
+paths:
+
+  /helloworld:
+    post:
+      summary: "Create a Helloworld translation"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Helloworld"
+      responses:
+        201:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Helloworld"
+      security:
+        - sigv4: [ ]
+      x-amazon-apigateway-request-validator: validate_request
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: 201
+        uri: "${helloworld_arn}"
+        passthroughBehavior: when_no_match
+        httpMethod: POST
+        type: aws_proxy
+
+components:
+  schemas:
+    Helloworld:
+      type: object
+      properties:
+        language:
+          type: string
+        value:
+          type: string
+
+securityDefinitions:
+  sigv4:
+    type: apiKey
+    name: Authorization
+    in: header
+    x-amazon-apigateway-authtype: awsSigv4
+
+x-amazon-apigateway-request-validators:
+  validate_request:
+    validateRequestBody: true
+    validateRequestParameters: true
