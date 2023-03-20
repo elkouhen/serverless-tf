@@ -1,7 +1,7 @@
 terraform {
   required_providers {
     aws = {
-     
+
       source  = "hashicorp/aws"
       version = "~> 4.59.0"
     }
@@ -15,7 +15,21 @@ terraform {
   }
 }
 
-
 module "helloworld" {
-  source = "../modules/helloworld"
+  source = "../modules/helloworld/"
+  env    = "dev"
+}
+
+module "api" {
+  source         = "../modules/api/"
+  env            = "dev"
+  helloworld_arn = module.helloworld.function_arn
+}
+
+output "api_arn" {
+  value = module.api.api_arn
+}
+
+output "helloworld_arn" {
+  value = module.helloworld.function_arn
 }
