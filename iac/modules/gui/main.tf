@@ -66,7 +66,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     bucket          = "bucket-gui-logs-${var.env}.s3.amazonaws.com"
   }
 
-  aliases = ["helloworld.sbx.aws.ippon.fr"]
+  aliases = ["helloworld-${var.env}.sbx.aws.ippon.fr"]
 
   default_cache_behavior {
     allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
@@ -116,7 +116,7 @@ provider "aws" {
 locals {
   domains = tolist(aws_acm_certificate.cert.domain_validation_options)
 
-  index = index(local.domains.*.domain_name, "helloworld.sbx.aws.ippon.fr")
+  index = index(local.domains.*.domain_name, "helloworld-${var.env}.sbx.aws.ippon.fr")
 }
 
 resource "aws_route53_record" "cert" {
@@ -133,10 +133,9 @@ resource "aws_route53_record" "cert" {
 
 resource "aws_acm_certificate" "cert" {
   provider          = aws.acm_provider
-  domain_name       = "helloworld.sbx.aws.ippon.fr"
+  domain_name       = "helloworld-${var.env}.sbx.aws.ippon.fr"
   validation_method = "DNS"
 
-  # subject_alternative_names = ["helloworld.sbx.aws.ippon.fr", aws_cloudfront_distribution.s3_distribution.domain_name]
   lifecycle {
     create_before_destroy = true
   }
@@ -153,7 +152,7 @@ resource "aws_acm_certificate_validation" "cert" {
 
 resource "aws_route53_record" "app_domain" {
   zone_id = data.aws_route53_zone.hosted_zone.zone_id
-  name    = "helloworld.sbx.aws.ippon.fr"
+  name    = "helloworld-${var.env}.sbx.aws.ippon.fr"
   type    = "A"
 
   alias {

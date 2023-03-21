@@ -21,20 +21,20 @@ module "helloworld" {
 }
 
 module "cognito" {
-  source         = "../modules/cognito/"
-  env            = "dev"
+  source = "../modules/cognito/"
+  env    = "dev"
 }
 
 module "api" {
   source         = "../modules/api/"
   env            = "dev"
   helloworld_arn = module.helloworld.function_arn
-  userpool_arn = module.cognito.userpool_arn
+  userpool_arn   = module.cognito.userpool_arn
 }
 
 module "gui" {
-  source         = "../modules/gui/"
-  env            = "dev"
+  source = "../modules/gui/"
+  env    = "dev"
 }
 
 output "userpool_arn" {

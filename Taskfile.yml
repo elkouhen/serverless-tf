@@ -17,6 +17,11 @@ tasks:
     cmds:
       - terraform apply -auto-approve
 
+  destroy:
+    dir: iac/dev
+    cmds:
+      - terraform destroy
+
   build-helloworld: 
     dir: src/helloworld
     cmds:
