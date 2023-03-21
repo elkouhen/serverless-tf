@@ -32,8 +32,9 @@ module "api" {
   userpool_arn = module.cognito.userpool_arn
 }
 
-output "spec" {
-  value = module.api.spec
+module "gui" {
+  source         = "../modules/gui/"
+  env            = "dev"
 }
 
 output "userpool_arn" {

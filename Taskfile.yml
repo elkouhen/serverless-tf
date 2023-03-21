@@ -1,0 +1,37 @@
+version: '3'
+
+tasks:
+
+  init: 
+    dir: iac/dev
+    cmds:
+      - terraform init
+
+  plan:
+    dir: iac/dev
+    cmds:
+      - terraform plan
+
+  apply:
+    dir: iac/dev
+    cmds:
+      - terraform apply -auto-approve
+
+  build-helloworld: 
+    dir: src/helloworld
+    cmds:
+      - npm run compile 
+  
+  build-gui: 
+    dir: src/gui
+    cmds:
+      - npm run build
+
+  build: 
+    deps:
+      - build-helloworld
+      - build-gui
+
+  deploy-gui: 
+    cmds: 
+      - aws s3 sync src/gui/dist/ s3://bucket-gui-dev

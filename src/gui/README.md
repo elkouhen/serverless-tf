@@ -1,4 +1,4 @@
-# helloworld-gui
+# gui
 
 ## Project setup
 ```
