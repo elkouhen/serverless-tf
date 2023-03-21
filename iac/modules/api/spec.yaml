@@ -3,6 +3,7 @@ info:
   version: "1"
   title: "Helloworld documentation"
 
+
 paths:
 
   /helloworld:
@@ -13,6 +14,8 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/Helloworld"
+      security:
+        - cognito: []
       responses:
         201:
           description: Successful response
@@ -20,8 +23,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Helloworld"
-      security:
-        - sigv4: [ ]
+
       x-amazon-apigateway-request-validator: validate_request
       x-amazon-apigateway-integration:
         responses:
@@ -42,12 +44,17 @@ components:
         value:
           type: string
 
-securityDefinitions:
-  sigv4:
-    type: apiKey
-    name: Authorization
-    in: header
-    x-amazon-apigateway-authtype: awsSigv4
+
+  securitySchemes:
+    cognito:
+      type: apiKey
+      name: Authorization
+      in: header
+      x-amazon-apigateway-authtype: cognito_user_pools
+      x-amazon-apigateway-authorizer:
+        type: cognito_user_pools
+        providerARNs:
+        - ${userpool_arn}
 
 x-amazon-apigateway-request-validators:
   validate_request:

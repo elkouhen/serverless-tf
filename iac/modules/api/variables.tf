@@ -4,6 +4,11 @@ variable "env" {
 }
 
 variable "helloworld_arn" {
-  description = "Environment ID"
+  description = "Helloworld ARN"
+  type        = string
+}
+
+variable "userpool_arn" {
+  description = "Userpool ARN"
   type        = string
 }

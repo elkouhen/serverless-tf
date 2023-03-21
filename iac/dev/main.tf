@@ -20,15 +20,24 @@ module "helloworld" {
   env    = "dev"
 }
 
+module "cognito" {
+  source         = "../modules/cognito/"
+  env            = "dev"
+}
+
 module "api" {
   source         = "../modules/api/"
   env            = "dev"
   helloworld_arn = module.helloworld.function_arn
+  userpool_arn = module.cognito.userpool_arn
 }
 
-module "cognito" {
-  source         = "../modules/cognito/"
-  env            = "dev"
+output "spec" {
+  value = module.api.spec
+}
+
+output "userpool_arn" {
+  value = module.cognito.userpool_arn
 }
 
 output "api_arn" {

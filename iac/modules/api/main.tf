@@ -6,6 +6,7 @@ data "template_file" "api" {
   vars = {
     helloworld_arn = var.helloworld_arn
     aws_region     = data.aws_region.current.name
+    userpool_arn   = var.userpool_arn
   }
 }
 
@@ -23,4 +24,12 @@ resource "aws_lambda_permission" "lambda_permission" {
   principal     = "apigateway.amazonaws.com"
 
   source_arn = "${aws_api_gateway_rest_api.api.execution_arn}/*"
+}
+
+resource "aws_api_gateway_authorizer" "api_authorizer" {
+  name        = "CognitoUserPoolAuthorizer"
+  type        = "COGNITO_USER_POOLS"
+  rest_api_id = aws_api_gateway_rest_api.api.id
+
+  provider_arns = [var.userpool_arn]
 }
