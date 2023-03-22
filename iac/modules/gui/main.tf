@@ -28,6 +28,15 @@ resource "aws_s3_bucket_versioning" "bucket" {
   }
 }
 
+resource "aws_s3_bucket_server_side_encryption_configuration" "bucket" {
+  bucket = aws_s3_bucket.logs.bucket
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm     = "aws:kms"
+    }
+  }
+}
+
 data "aws_iam_policy_document" "bucket" {
   statement {
     actions   = ["s3:GetObject"]
@@ -57,12 +66,13 @@ resource "aws_s3_bucket_policy" "bucket" {
 
 resource "aws_s3_bucket" "logs" {
   bucket = local.logs_bucket_name
+}
 
-  server_side_encryption_configuration {
-    rule {
-      apply_server_side_encryption_by_default {
-        sse_algorithm     = "aws:kms"
-      }
+resource "aws_s3_bucket_server_side_encryption_configuration" "logs" {
+  bucket = aws_s3_bucket.logs.bucket
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm     = "aws:kms"
     }
   }
 }
