@@ -15,7 +15,7 @@ resource "aws_cognito_resource_server" "resource_server" {
 
 resource "aws_cognito_user_pool_domain" "domain" {
   domain = "helloworld-${var.env}"
-  
+
   user_pool_id = aws_cognito_user_pool.pool.id
 }
 

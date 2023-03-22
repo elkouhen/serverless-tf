@@ -8,9 +8,9 @@ module "lambda_function" {
   source = "terraform-aws-modules/lambda/aws"
 
   function_name = "helloworld-${var.env}-lambda"
-  
-  handler       = "index.handler"
-  runtime       = "nodejs18.x"
+
+  handler = "index.handler"
+  runtime = "nodejs18.x"
 
   create_package         = false
   local_existing_package = data.archive_file.function_archive.output_path
