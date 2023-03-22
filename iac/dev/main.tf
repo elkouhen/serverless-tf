@@ -1,10 +1,38 @@
 terraform {
+
+  required_version = ">= 1.4"
+
   required_providers {
     aws = {
-
       source  = "hashicorp/aws"
       version = "~> 4.59.0"
     }
+
+    template = {
+      source  = "hashicorp/template"
+      version = "~> 2.2.0"
+    }
+
+    archive = {
+      source  = "hashicorp/archive"
+      version = "~> 2.3.0"
+    }
+
+    null = {
+      source  = "hashicorp/null"
+      version = "~> 3.2.1"
+    }
+
+    external = {
+      source  = "hashicorp/external"
+      version = "~> 2.3.1"
+    }
+
+    local = {
+      source  = "hashicorp/local"
+      version = "~> 2.4.0"
+    }
+
   }
 
   backend "s3" {
@@ -15,36 +43,9 @@ terraform {
   }
 }
 
-module "helloworld" {
-  source = "../modules/helloworld/"
-  env    = "dev"
-}
-
-module "cognito" {
-  source = "../modules/cognito/"
-  env    = "dev"
-}
-
-module "api" {
-  source         = "../modules/api/"
-  env            = "dev"
-  helloworld_arn = module.helloworld.function_arn
-  userpool_arn   = module.cognito.userpool_arn
-}
-
-module "gui" {
-  source = "../modules/gui/"
-  env    = "dev"
-}
-
-output "userpool_arn" {
-  value = module.cognito.userpool_arn
-}
-
-output "api_arn" {
-  value = module.api.api_arn
-}
-
-output "helloworld_arn" {
-  value = module.helloworld.function_arn
+module "app" {
+  source      = "../app/"
+  env         = "dev"
+  hosted_zone = "sbx.aws.ippon.fr"
+  domain_name = "hellworld-dev"
 }

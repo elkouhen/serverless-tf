@@ -40,3 +40,8 @@ tasks:
   deploy-gui: 
     cmds: 
       - aws s3 sync src/gui/dist/ s3://bucket-gui-dev
+
+  clean: 
+    cmds: 
+      - rm -rf iac/dev/.terraform
+      - rm -rf iac/dev/builds

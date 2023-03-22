@@ -1,5 +1,10 @@
+provider "aws" {
+  alias  = "acm_provider"
+  region = "us-east-1"
+}
+
 resource "aws_s3_bucket" "bucket" {
-  bucket = "bucket-gui-${var.env}"
+  bucket = "bucket-${var.domain_name}"
 }
 
 data "aws_iam_policy_document" "bucket" {
@@ -30,7 +35,7 @@ resource "aws_s3_bucket_policy" "bucket" {
 }
 
 resource "aws_s3_bucket" "logs" {
-  bucket = "bucket-gui-logs-${var.env}"
+  bucket = "bucket-logs-${var.domain_name}"
 }
 
 resource "aws_s3_bucket_acl" "bucket_acl" {
@@ -66,7 +71,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     bucket          = "bucket-gui-logs-${var.env}.s3.amazonaws.com"
   }
 
-  aliases = ["helloworld-${var.env}.sbx.aws.ippon.fr"]
+  aliases = ["${var.domain_name}.${var.hosted_zone}"]
 
   default_cache_behavior {
     allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
@@ -105,18 +110,13 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
 }
 
 data "aws_route53_zone" "hosted_zone" {
-  name = "sbx.aws.ippon.fr"
-}
-
-provider "aws" {
-  alias  = "acm_provider"
-  region = "us-east-1"
+  name = var.hosted_zone
 }
 
 locals {
   domains = tolist(aws_acm_certificate.cert.domain_validation_options)
 
-  index = index(local.domains.*.domain_name, "helloworld-${var.env}.sbx.aws.ippon.fr")
+  index = index(local.domains.*.domain_name, "${var.domain_name}.${var.hosted_zone}")
 }
 
 resource "aws_route53_record" "cert" {
@@ -130,10 +130,9 @@ resource "aws_route53_record" "cert" {
   ttl     = 60
 }
 
-
 resource "aws_acm_certificate" "cert" {
   provider          = aws.acm_provider
-  domain_name       = "helloworld-${var.env}.sbx.aws.ippon.fr"
+  domain_name       = "${var.domain_name}.${var.hosted_zone}"
   validation_method = "DNS"
 
   lifecycle {
@@ -152,7 +151,7 @@ resource "aws_acm_certificate_validation" "cert" {
 
 resource "aws_route53_record" "app_domain" {
   zone_id = data.aws_route53_zone.hosted_zone.zone_id
-  name    = "helloworld-${var.env}.sbx.aws.ippon.fr"
+  name    = "${var.domain_name}.${var.hosted_zone}"
   type    = "A"
 
   alias {
