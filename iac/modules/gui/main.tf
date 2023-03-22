@@ -3,8 +3,29 @@ provider "aws" {
   region = "us-east-1"
 }
 
+
+locals {
+  logs_bucket_name = "bucket-logs-${var.domain_name}"
+  bucket_name = "bucket-cloudfront-${var.domain_name}"
+}
+
 resource "aws_s3_bucket" "bucket" {
-  bucket = "bucket-${var.domain_name}"
+  bucket = local.bucket_name
+
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        sse_algorithm     = "aws:kms"
+      }
+    }
+  }
+}
+
+resource "aws_s3_bucket_versioning" "bucket" {
+  bucket = aws_s3_bucket.bucket.id
+  versioning_configuration {
+    status = "Enabled"
+  }
 }
 
 data "aws_iam_policy_document" "bucket" {
@@ -35,7 +56,22 @@ resource "aws_s3_bucket_policy" "bucket" {
 }
 
 resource "aws_s3_bucket" "logs" {
-  bucket = "bucket-logs-${var.domain_name}"
+  bucket = local.logs_bucket_name
+
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        sse_algorithm     = "aws:kms"
+      }
+    }
+  }
+}
+
+resource "aws_s3_bucket_versioning" "logs" {
+  bucket = aws_s3_bucket.logs.id
+  versioning_configuration {
+    status = "Enabled"
+  }
 }
 
 resource "aws_s3_bucket_acl" "bucket_acl" {
@@ -48,7 +84,7 @@ locals {
 }
 
 resource "aws_cloudfront_origin_access_identity" "default" {
-  comment = "Some comment"
+
 }
 
 resource "aws_cloudfront_distribution" "s3_distribution" {
@@ -68,7 +104,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
 
   logging_config {
     include_cookies = false
-    bucket          = "bucket-gui-logs-${var.env}.s3.amazonaws.com"
+    bucket          = "${local.logs_bucket_name}.s3.amazonaws.com"
   }
 
   aliases = ["${var.domain_name}.${var.hosted_zone}"]
